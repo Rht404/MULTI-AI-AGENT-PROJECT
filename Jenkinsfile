@@ -19,22 +19,45 @@ pipeline{
             }
         }
 
-    stage('SonarQube Analysis'){
-			steps {
-				withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+    // stage('SonarQube Analysis'){
+	// 		steps {
+	// 			withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
     					
-					withSonarQubeEnv('Sonarqube') {
-    						sh """
-						${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-						-Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-						-Dsonar.sources=. \
-						-Dsonar.host.url=http://sonarqube-dind:9000 \
-						-Dsonar.login=${SONAR_TOKEN}
-						"""
-					}
-				}
-			}
-		}
+	// 				withSonarQubeEnv('Sonarqube') {
+    // 						sh """
+	// 					${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+	// 					-Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+	// 					-Dsonar.sources=. \
+	// 					-Dsonar.host.url=http://sonarqube-dind:9000 \
+	// 					-Dsonar.login=${SONAR_TOKEN}
+	// 					"""
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+    stage('SonarQube Analysis'){
+            steps {
+                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+
+                withSonarQubeEnv('Sonarqube') {
+
+                    sh '''
+                    ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://host.docker.internal:9000 \
+                    -Dsonar.token=$SONAR_TOKEN
+                    '''
+            }
+        }
+    }
+}
+
+
+
+
+
 
     // stage('Build and Push Docker Image to ECR') {
     //         steps {
