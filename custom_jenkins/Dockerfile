@@ -25,14 +25,13 @@
 # USER jenkins
 
 
-
 # Jenkins LTS base image
 FROM jenkins/jenkins:lts
 
 # Switch to root user
 USER root
 
-# Install Docker properly for modern Debian/Jenkins images
+# Install Docker and configure Jenkins Docker access
 RUN apt-get update && \
     apt-get install -y \
     ca-certificates \
@@ -55,17 +54,13 @@ RUN apt-get update && \
     containerd.io \
     docker-buildx-plugin \
     docker-compose-plugin && \
+    groupadd -f docker && \
+    usermod -aG docker jenkins && \
+    mkdir -p /var/lib/docker && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Add Jenkins user to Docker group
-RUN groupadd -f docker && \
-    usermod -aG docker jenkins
-
-# Docker working directory
-RUN mkdir -p /var/lib/docker
-
-# Optional Docker volume
+# Docker persistent storage
 VOLUME /var/lib/docker
 
 # Switch back to Jenkins user
